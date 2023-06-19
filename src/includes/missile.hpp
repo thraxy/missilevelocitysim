@@ -3,6 +3,7 @@
 // add member function think we might need, examples: launch(), getvelocity(), getposition(), getmass()
 
 #include <iostream>
+#include <cmath>
 
 
 class Missile {
@@ -53,22 +54,37 @@ Missile::Missile(double intVelocity, double thrust, double drag, double mass, do
     this->altitude = altitude;
 }
 
+// calculating windforce based the windspeed and direction inputs
+double calcWindForce(double windSpeed, double windDirection) {
+    // converting the wind direction to radians
+    // M_PI = 3.14....
+    // conversion is required because the functions expect the angles to be in radians and not degrees
+    double windDirectionRad = windDirection * (M_PI/ 180.0);
+
+    // calculating wind force
+    double windForce = windSpeed * cos(windDirectionRad);
+
+    return windForce;
+}
+
 void Missile::simulateFlight() {
 
     // simulate logic
     double time = 0.0;
     double position = 0.0;
     double velocity = intVelocity;
+    double windForce = calcWindForce(windSpeed, windDirection);
+
 
     // sim loop
     while (altitude > 0) {
 
-        // netforce 
-        double netForce = thrust - drag - mass * gravity;
+        // netforce Newton's second Law : F = ma 
+        double netForce = thrust - drag - mass * gravity + windForce;
 
         // update velocity and position
-        velocity += (netForce / mass) * time;
-        position += velocity * time;
+        velocity += ((netForce / mass) * time) - (windForce / mass) * time;
+        position += (velocity * time) - (windSpeed * time);
 
         // update altitude based on the position
         altitude -= position;
