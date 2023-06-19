@@ -6,3 +6,6 @@
 
 # ignore compiler and ide files
 .vscode/
+
+# ignore binary file created by cmake
+myprogram
