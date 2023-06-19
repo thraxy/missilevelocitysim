@@ -1,0 +1,8 @@
+# ignore file extensions
+*.o
+*.obj
+*.exe
+*.dll
+
+# ignore compiler and ide files
+.vscode/
