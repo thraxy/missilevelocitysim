@@ -9,6 +9,8 @@
 class Missile {
     
     double intVelocity; // initial velocity of the missile
+    double velocity; // velocity
+    double position; // position of the missile
     double thrust; // thrust from the missile
     double drag; // the drag that the missile experiences
     double mass; // the weight of the missile
@@ -22,36 +24,89 @@ public:
 
     Missile(double intVelocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude);
 
-    double getVelocity();
+    double getVelocity() const {
+        return velocity;
+    }
 
-    double getPosition();
+    double getPosition() const {
+        return position;
+    }
 
-    double getThrust();
+    double getThrust() const {
+        return thrust;
+    }
 
-    double getDrag();
+    double getDrag() const {
+        return drag;
+    }
 
-    double getMass();
+    double getMass() const {
+        return mass;
+    }
 
-    double getWindSpeed();
+    double getWindSpeed() const {
+        return windSpeed;
+    }
 
-    double getWindDirc();
+    double getWindDirc() const {
+        return windDirection;
+    }
 
-    double getAltitude();
+    double getAltitude() const {
+        return altitude;
+    }
+
+    void setVelocity(double velocity) {
+        this->velocity = velocity;
+    }
+
+    void setPosition(double position) {
+        this->position = position;
+    }
+
+    void setThrust(double thrust) {
+        this->thrust = thrust;
+    }
+
+    void setDrag(double drag) {
+        this->drag = drag;
+    }
+
+    void setMass(double mass) {
+        this->mass = mass;
+    }
+
+    void setWindSpeed(double windSpeed) {
+        this->windSpeed = windSpeed;
+    }
+
+    void setWindDirection(double windDirection) {
+        this->windDirection = windDirection;
+    }
+
+    void setAltitude(double altitude) {
+        this->altitude = altitude;
+    }
 
     void simulateFlight();
 
 };
 
+
+
 Missile::Missile(double intVelocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude){
 
-    this->intVelocity = intVelocity;
-    this->thrust = thrust;
-    this->drag = drag;
-    this->mass = mass;
+    getVelocity();
+    getThrust();
+    getDrag();
+
     this->gravity = gravity;
-    this->windSpeed = windSpeed;
-    this->windDirection = windDirection;
-    this->altitude = altitude;
+
+    getMass();
+    getWindSpeed();
+    getWindDirc();
+    getAltitude();
+    
 }
 
 // calculating windforce based the windspeed and direction inputs
@@ -71,8 +126,8 @@ void Missile::simulateFlight() {
 
     // simulate logic
     double time = 0.0;
-    double position = 0.0;
-    double velocity = intVelocity;
+    position = 0.0;
+    velocity = intVelocity;
     double windForce = calcWindForce(windSpeed, windDirection);
 
 
