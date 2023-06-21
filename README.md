@@ -10,6 +10,7 @@ So far I have implement the formulas needed for the simulation for the missile. 
 
 ## To-Do
 I want to implement:
+
 ✔️- visualizing the simulation
 - create a user interface
 - give the option for the user to skip inputing their own values
