@@ -4,11 +4,13 @@
 
 #include <iostream>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
 
 class Missile {
     
-    double intVelocity; // initial velocity of the missile
     double velocity; // velocity
     double position; // position of the missile
     double thrust; // thrust from the missile
@@ -22,91 +24,105 @@ class Missile {
 
 public:
 
-    Missile(double intVelocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude);
-
-    double getVelocity() const {
-        return velocity;
-    }
-
-    double getPosition() const {
-        return position;
-    }
-
-    double getThrust() const {
-        return thrust;
-    }
-
-    double getDrag() const {
-        return drag;
-    }
-
-    double getMass() const {
-        return mass;
-    }
-
-    double getWindSpeed() const {
-        return windSpeed;
-    }
-
-    double getWindDirc() const {
-        return windDirection;
-    }
-
-    double getAltitude() const {
-        return altitude;
-    }
-
-    void setVelocity(double velocity) {
-        this->velocity = velocity;
-    }
-
-    void setPosition(double position) {
-        this->position = position;
-    }
-
-    void setThrust(double thrust) {
-        this->thrust = thrust;
-    }
-
-    void setDrag(double drag) {
-        this->drag = drag;
-    }
-
-    void setMass(double mass) {
-        this->mass = mass;
-    }
-
-    void setWindSpeed(double windSpeed) {
-        this->windSpeed = windSpeed;
-    }
-
-    void setWindDirection(double windDirection) {
-        this->windDirection = windDirection;
-    }
-
-    void setAltitude(double altitude) {
-        this->altitude = altitude;
-    }
-
+    Missile(double velocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude);
+    // getters
+    double getVelocity() const;
+    double getPosition() const;
+    double getThrust() const;
+    double getDrag() const;
+    double getMass() const;
+    double getWindSpeed() const;
+    double getWindDirc() const;
+    double getAltitude() const;
+    // setters
+    void setVelocity(double velocity);
+    void setPosition(double position);
+    void setThrust(double thrust);
+    void setDrag(double drag);
+    void setMass(double mass);
+    void setWindSpeed(double windSpeed);
+    void setWindDirc(double windDirection);
+    void setAltitude(double altitude);
+    // sim flight
     void simulateFlight();
 
 };
 
 
 
-Missile::Missile(double intVelocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude){
-
-    getVelocity();
-    getThrust();
-    getDrag();
-
+Missile::Missile(double velocity, double thrust, double drag, double mass, double gravity, double windSpeed, double windDirection, double altitude){
+    this->velocity = velocity;
+    this->thrust = thrust;
+    this->drag = drag;
+    this->mass = mass;
     this->gravity = gravity;
+    this->windSpeed = windSpeed;
+    this->windDirection = windDirection;
+    this->altitude = altitude;
+}
 
-    getMass();
-    getWindSpeed();
-    getWindDirc();
-    getAltitude();
-    
+double Missile::getVelocity() const {
+    return velocity;
+}
+
+double Missile::getPosition() const {
+    return position;
+}
+
+double Missile::getThrust() const {
+    return thrust;
+}
+
+double Missile::getDrag() const {
+    return drag;
+}
+
+double Missile::getMass() const {
+    return mass;
+}
+
+double Missile::getWindSpeed() const {
+    return windSpeed;
+}
+
+double Missile::getWindDirc() const {
+    return windDirection;
+}
+
+double Missile::getAltitude() const {
+    return altitude;
+}
+
+void Missile::setVelocity(double velocity) {
+    this->velocity = velocity;
+}
+
+void Missile::setPosition(double position) {
+    this->position = position;
+}
+
+void Missile::setThrust(double thrust) {
+    this->thrust = thrust;
+}
+
+void Missile::setDrag(double drag) {
+    this->drag = drag;
+}
+
+void Missile::setMass(double mass) {
+    this->mass = mass;
+}
+
+void Missile::setWindSpeed(double windSpeed) {
+    this->windSpeed = windSpeed;
+}
+
+void Missile::setWindDirc(double windDirection) {
+    this->windDirection = windDirection;
+}
+
+void Missile::setAltitude(double altitude) {
+    this->altitude = altitude;
 }
 
 // calculating windforce based the windspeed and direction inputs
@@ -126,30 +142,71 @@ void Missile::simulateFlight() {
 
     // simulate logic
     double time = 0.0;
-    position = 0.0;
-    velocity = intVelocity;
-    double windForce = calcWindForce(windSpeed, windDirection);
+    setPosition(0.0);
+    setVelocity(getVelocity());
+    double windForce = calcWindForce(getWindSpeed(), getWindDirc());
 
+    // time increment based on simulation
+    double simDuration = 90.0; // max duration
+    double timeStep = 0.1;
+
+    // generate a unique name based on existing files
+    std::string baseFileName = "data";
+    int fileNum = 1;
+    std::string fileName;
+    std::string outputDir;
+
+    // loop to check and increment the file number
+    while (true) {
+        std::ostringstream oss;
+        // basename + filenum + .csv
+        oss << baseFileName << fileNum << ".csv";
+        // save and convert file name to string
+        fileName = oss.str();
+        // file path converted to a string
+        outputDir = "output/" + fileName;
+        // checks if file exists
+        std::ifstream fileExists(outputDir);
+        if (!fileExists){
+            break;
+        }
+        fileNum++;
+    }
+    
+    // open file from path
+    std::ofstream file(outputDir);
+
+    // check if file is opened
+    if (!file.is_open()) {
+        std::cout<<"Failed to open the data file."<<std::endl;
+        return;
+    }
 
     // sim loop
-    while (altitude > 0) {
+    while (getAltitude() > 0 && time <= simDuration) {
 
         // netforce Newton's second Law : F = ma 
-        double netForce = thrust - drag - mass * gravity + windForce;
+        double netForce = getThrust() - getDrag() - getMass() * gravity + windForce;
 
         // update velocity and position
-        velocity += ((netForce / mass) * time) - (windForce / mass) * time;
-        position += (velocity * time) - (windSpeed * time);
+        setVelocity(getVelocity() + ((netForce / getMass()) * timeStep) - (windForce / getMass()) * timeStep);
+        setPosition(getPosition() + (getVelocity() * timeStep) - (getWindSpeed() * timeStep));
 
         // update altitude based on the position
-        altitude -= position;
+        setAltitude(getAltitude() - std::abs(getPosition()));
 
         // print time and missile information
-        std::cout << "Time: " << time << "s | Altitude: " << altitude << "m | Velocity: " << velocity << "m/s" << std::endl;
+        std::cout << "Time: " << time << "s | Altitude: " << getAltitude() << "m | Velocity: " << getVelocity() << "m/s" << std::endl;
+
+        // print time and missile information to outputfile
+        file << time << "," << getAltitude() << "," << getVelocity() << std::endl;
 
         // increment time
-        time += 1.0;
+        time += timeStep;
     }
+
+    // close output file
+    file.close();
 
     // flight simulation is complete
     std::cout <<"Flight Simulation complete." << std::endl;
